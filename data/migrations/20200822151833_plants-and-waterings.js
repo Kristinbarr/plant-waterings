@@ -6,7 +6,7 @@ exports.up = async knex => {
   })
   await knex.schema.createTable('waterings', tbl => {
     tbl.increments()
-    tbl.timestamp('created_at', ).notNullable()
+    tbl.timestamp('created_at').notNullable()
     tbl
       .integer('plant_id')
       .unsigned()
