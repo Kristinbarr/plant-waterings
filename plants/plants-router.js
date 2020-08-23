@@ -1,28 +1,84 @@
-const express = 'express'
+const express = require('express')
 const Plants = require('./plants-model')
 
 const router = express.Router()
 
-router.get('/plants', (req, res) => {
-  Plants.find()
-    .then(plants => {
+// GET all plants
+router.get('/', async (req, res) => {
+  try {
+    const plants = await Plants.find()
+    if (plants) {
       res.status(200).json(plants)
-    }).catch(err => {
-      res.status(400).json({
-
-      })
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error finding plants',
     })
+  }
 })
 
-router.get('/:id', (req, res) => {})
+// GET plant by id
+router.get('/:id', async (req, res) => {
+  try {
+    const plant = await Plants.findById(req.params.id)
+    if (plant) {
+      res.status(200).json(plant)
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error getting the plant',
+    })
+  }
+})
 
-router.delete('/:id', (req, res) => {})
+// POST a new plant
+router.post('/:id', async (req, res) => {
+  try {
+    // TODO: make sure plant doesn't exist already
+    const newPlant = await Plants.insert(req.params.id, req.body)
+    if (newPlant) {
+      res.status(201).json()
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error adding the plant',
+    })
+  }
+})
 
-router.put('/:id', (req, res) => {})
+// UPDATE a plant
+router.put('/:id', async (req, res) => {
+  try {
+    // TODO: make sure plant exists
+    const updatedPlant = await Plants.update(req.params.id, req.body)
+    if (updatedPlant) {
+      res.status(200).json(updatedPlant)
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error updating the plant',
+    })
+  }
+})
+
+// DELETE a plant
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await Plants.remove(req.params.id)
+    if (deleted) {
+      res.status(200).json(deleted)
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error deleting the plant'
+    })
+  }
+})
+
 
 // custom middleware
 
-// function validatePostId(req, res, next) {
+// function validatePlantId(req, res, next) {
 
 // };
 
