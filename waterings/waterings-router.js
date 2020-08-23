@@ -1,5 +1,6 @@
 const express = require('express')
 const Waterings = require('./waterings-model')
+const Plants = require('./plants-model')
 
 const router = express.Router()
 
@@ -32,10 +33,14 @@ router.get('/:id', async (req, res) => {
 })
 
 // POST a new watering
+// no request body needed, plant_id is param, timestamp is immediately generated
 router.post('/:id', async (req, res) => {
   try {
-    // TODO: check if watering already exists (same timestamp?)
-    // TODO: possibly query for plant name insted of id
+    // TODO: possibly query to return plant name insted of/alongside id
+    const plantExists = await Plants.findById(req.params.id)
+    if (plantExists) {
+      res.status(400).json({ message: 'Plant does not exist' })
+    }
     const newWatering = { created_at: new Date(), plant_id: req.params.id }
     const newWateringRes = await Waterings.insert(newWatering)
     if (newWateringRes) {
@@ -50,9 +55,13 @@ router.post('/:id', async (req, res) => {
 
 // UPDATE a watering
 // request body example: { created_at: "2020-08-19T19:01:47.937Z"}
+// plant_id is the param
 router.put('/:id', async (req, res) => {
   try {
-    // TODO: make sure watering exists before updating it
+    const wateringExists = await Waterings.findById(req.params.id)
+    if (!wateringExists) {
+      res.status(400).json({ message: 'Watering does not exist' })
+    }
     const updatedWatering = await Waterings.update(req.params.id, req.body)
     if (updatedWatering) {
       res.status(200).json(updatedWatering)
@@ -68,8 +77,10 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const deleted = await Waterings.remove(req.params.id)
-    if (deleted) {
+    if (deleted === 1) {
       res.status(200).json(deleted)
+    } else if (deleted === 0) {
+      res.status(400).json({ message: 'Watering does not exist' })
     }
   } catch (error) {
     res.status(500).json({
