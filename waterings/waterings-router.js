@@ -1,6 +1,6 @@
 const express = require('express')
 const Waterings = require('./waterings-model')
-const Plants = require('./plants-model')
+const Plants = require('../plants/plants-model')
 
 const router = express.Router()
 
@@ -38,7 +38,7 @@ router.post('/:id', async (req, res) => {
   try {
     // TODO: possibly query to return plant name insted of/alongside id
     const plantExists = await Plants.findById(req.params.id)
-    if (plantExists) {
+    if (!plantExists) {
       res.status(400).json({ message: 'Plant does not exist' })
     }
     const newWatering = { created_at: new Date(), plant_id: req.params.id }
