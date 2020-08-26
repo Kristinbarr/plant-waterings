@@ -18,9 +18,10 @@ function findById(id) {
 
 function insert(plant) {
   return db('plants')
+    .returning(['id', 'name', 'variety'])
     .insert(plant)
-    .then(ids => {
-      return getById(ids[0])
+    .then(id => {
+      return id
     })
 }
 
