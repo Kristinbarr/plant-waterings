@@ -1,6 +1,13 @@
 const express = require('express')
 const Plants = require('./plants-model')
 
+var StatsD = require('hot-shots')
+var dogstatsd = new StatsD()
+// Increment a counter.
+dogstatsd.increment('plant.count')
+dogstatsd.timing('response_time', new Date())
+dogstatsd.histogram('plant_histogram', 42)
+
 const router = express.Router()
 
 // GET all plants
