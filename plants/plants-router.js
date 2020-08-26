@@ -32,12 +32,13 @@ router.get('/:id', async (req, res) => {
 })
 
 // POST a new plant
-router.post('/:id', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     // TODO: make sure plant doesn't exist already
-    const newPlant = await Plants.insert(req.params.id, req.body)
+
+    const newPlant = await Plants.insert(req.body)
     if (newPlant) {
-      res.status(201).json()
+      res.status(201).json(newPlant)
     }
   } catch (error) {
     res.status(500).json({
@@ -65,8 +66,10 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const deleted = await Plants.remove(req.params.id)
-    if (deleted) {
+    if (deleted === 1) {
       res.status(200).json(deleted)
+    } else if (deleted === 0) {
+      res.status(400).json({ message: 'Plant does not exist' })
     }
   } catch (error) {
     res.status(500).json({
