@@ -2,12 +2,27 @@ const express = require('express')
 const Waterings = require('./waterings-model')
 const Plants = require('../plants/plants-model')
 
+var StatsD = require('hot-shots')
+var dogstatsd = new StatsD()
+// Increment a counter.
+dogstatsd.increment('page.views')
+dogstatsd.timing('response_time', new Date())
+dogstatsd.set(['waterings'], 42, function (error, bytes) {
+  //this only gets called once after all messages have been sent
+  if (error) {
+    console.error('Oh noes! There was an error:', error)
+  } else {
+    console.log('Successfully sent', bytes, 'bytes')
+  }
+})
+
 const router = express.Router()
 
 // GET all waterings
 router.get('/', async (req, res) => {
   try {
-    const allWaterings = await Waterings.findAllWaterings()
+    const allWaterings = await Waterings.find()
+
     if (allWaterings) {
       res.status(200).json(allWaterings)
     }
@@ -18,7 +33,7 @@ router.get('/', async (req, res) => {
   }
 })
 
-// GET waterings by plant id
+// GET waterings by PLANT id
 router.get('/:id', async (req, res) => {
   try {
     const waterings = await Waterings.findWateringsById(req.params.id)
@@ -55,6 +70,7 @@ router.post('/:id', async (req, res) => {
 
 // UPDATE a watering
 // request body example: { created_at: "2020-08-19T19:01:47.937Z"}
+// will need to capture specific time on the front end
 // plant_id is the param
 router.put('/:id', async (req, res) => {
   try {
