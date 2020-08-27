@@ -59,6 +59,7 @@ router.post('/:id', async (req, res) => {
     const newWatering = { created_at: new Date(), plant_id: req.params.id }
     const newWateringRes = await Waterings.insert(newWatering)
     if (newWateringRes) {
+      dogstatsd.increment(`watering.${req.params.id}`)
       res.status(201).json(newWateringRes)
     }
   } catch (error) {
