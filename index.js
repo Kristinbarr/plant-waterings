@@ -7,15 +7,10 @@ tracer.init({
   profiling: true,
 })
 
-// tracer.use('pg', {
-//   analytics: true
-// })
-
 // StatsD
 var StatsD = require('hot-shots')
 var dogstatsd = new StatsD()
 dogstatsd.increment('plant-waterings-index')
-// dogstatsd.histogram('my_histogram', 42)
 
 const server = require('./server')
 const PORT = process.env.PORT || 3000
